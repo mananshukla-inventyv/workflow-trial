@@ -1,7 +1,7 @@
 name: CI
 env:
   DEBUG: napi:*
-  APP_NAME: support
+  APP_NAME: package-template
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 permissions:
   contents: write
@@ -35,7 +35,7 @@ jobs:
             target: x86_64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
             build: yarn build --target x86_64-unknown-linux-gnu
-    name: stable - ${{ matrix.settings.target }} - node@20
+    name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -45,34 +45,7 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-
-      # Install Protobuf and OpenSSL dependencies for macOS
-      - name: Install Protobuf and OpenSSL on macOS
-        if: matrix.settings.host == 'macos-latest'
-        run: |
-          brew install protobuf openssl
-          export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig"
-        shell: bash
-
-      # Install Protobuf and OpenSSL dependencies for Windows
-      - name: Install Protobuf and OpenSSL on Windows
-        if: matrix.settings.host == 'windows-latest'
-        run: |
-          choco install protoc
-          choco install openssl
-          set PATH=C:\Program Files\Protoc\bin;%PATH%
-          set PATH=C:\Program Files\OpenSSL-Win64\bin;%PATH%
-        shell: cmd
-
-      # Install Protobuf and OpenSSL dependencies for Linux
-      - name: Install Protobuf and OpenSSL on Linux
-        if: matrix.settings.host == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y protobuf-compiler libssl-dev
-        shell: bash
-
-      - name: Install
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.settings.docker }}
         with:
@@ -88,6 +61,22 @@ jobs:
             .cargo-cache
             target/
           key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
+      - name: Install OpenSSL and Protobuf on macOS
+        if: matrix.settings.host == 'macos-latest'
+        run: |
+          brew install openssl@1.1
+          brew install protobuf
+      - name: Install OpenSSL and Protobuf on Ubuntu
+        if: matrix.settings.host == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt install -y cmake libclang-dev
+          sudo apt install -y protobuf-compiler libprotobuf-dev
+      - name: Install OpenSSL and Protobuf on Windows
+        if: matrix.settings.host == 'windows-latest'
+        run: |
+          choco install openssl.light
+          choco install protoc
       - uses: goto-bus-stop/setup-zig@v2
         if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' || matrix.settings.target == 'armv7-unknown-linux-musleabihf' }}
         with:
@@ -126,7 +115,6 @@ jobs:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.APP_NAME }}.*.node
           if-no-files-found: error
-
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
     needs:
@@ -150,7 +138,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: yarn
-          architecture: x64
+          architecture: ${{ matrix.settings.architecture }}
       - name: Install dependencies
         run: yarn install
       - name: Download artifacts
@@ -163,7 +151,6 @@ jobs:
         shell: bash
       - name: Test bindings
         run: yarn test
-
   test-linux-x64-gnu-binding:
     name: Test bindings on Linux-x64-gnu - node@${{ matrix.node }}
     needs:
@@ -194,7 +181,6 @@ jobs:
         shell: bash
       - name: Test bindings
         run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim yarn test
-
   publish:
     name: Publish
     runs-on: ubuntu-latest
