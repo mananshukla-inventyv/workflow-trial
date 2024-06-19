@@ -31,42 +31,71 @@ jobs:
           - host: macos-latest
             target: x86_64-apple-darwin
             build: yarn build --target x86_64-apple-darwin
+            dependencies: brew install openssl
+
           - host: windows-latest
             build: yarn build --target x86_64-pc-windows-msvc
             target: x86_64-pc-windows-msvc
+            dependencies: choco install openssl
+
           - host: windows-latest
             build: |
               yarn build --target i686-pc-windows-msvc
               yarn test
             target: i686-pc-windows-msvc
+            dependencies: choco install openssl
+
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
             build: yarn build --target x86_64-unknown-linux-gnu
+            dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y openssl libssl-dev
+
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             build: yarn build --target x86_64-unknown-linux-musl
+            dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y openssl libssl-dev
+
           - host: macos-latest
             target: aarch64-apple-darwin
             build: yarn build --target aarch64-apple-darwin
+            dependencies: brew install openssl
+
           - host: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
             build: yarn build --target aarch64-unknown-linux-gnu
+            dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y openssl libssl-dev
+
           - host: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
             setup: |
               sudo apt-get update
               sudo apt-get install gcc-arm-linux-gnueabihf -y
+              sudo apt-get install -y openssl libssl-dev
             build: |
               yarn build --target armv7-unknown-linux-gnueabihf
           - host: ubuntu-latest
             target: aarch64-linux-android
             build: yarn build --target aarch64-linux-android
+            dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y openssl libssl-dev
+
           - host: ubuntu-latest
             target: armv7-linux-androideabi
             build: yarn build --target armv7-linux-androideabi
+            dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y openssl libssl-dev
+
           - host: ubuntu-latest
             target: aarch64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
@@ -74,12 +103,25 @@ jobs:
               set -e &&
               rustup target add aarch64-unknown-linux-musl &&
               yarn build --target aarch64-unknown-linux-musl
+            dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y openssl libssl-dev
+
           - host: windows-latest
             target: aarch64-pc-windows-msvc
             build: yarn build --target aarch64-pc-windows-msvc
+            dependencies: choco install openssl
+
     name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
+      - name: Install dependencies
+        run: |
+          yarn install
+          ${{ matrix.settings.dependencies }}
+        if: ${{ matrix.settings.dependencies }}
+        shell: bash
+
       - uses: actions/checkout@v4
       - name: Setup node
         uses: actions/setup-node@v4
@@ -161,6 +203,7 @@ jobs:
           shell: bash
           run: |
             sudo pkg install -y -f curl node libnghttp2 npm
+            sudo pkg install -y -f curl node libnghttp2 npm openssl
             sudo npm install -g yarn --ignore-scripts
             curl https://sh.rustup.rs -sSf --output rustup.sh
             sh rustup.sh -y --profile minimal --default-toolchain beta
