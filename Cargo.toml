@@ -22,6 +22,8 @@ log = "0.4.17"   # for logger
 log4rs = { version ="1.0.0", features = ["gzip"] }
 config = "0.13.2"   #for config
 lazy_static = "1.4"  #static declaration
+openssl = { version = "0.10", features = ["vendored"] }
+openssl-sys = "0.9"
 
 [build-dependencies]
 napi-build = "2.0.1"

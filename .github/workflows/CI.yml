@@ -19,13 +19,16 @@ permissions:
       - .editorconfig
       - docs/**
   pull_request: null
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
+           - host: macos-latest
             target: x86_64-apple-darwin
             build: yarn build --target x86_64-apple-darwin
           - host: windows-latest
@@ -35,7 +38,7 @@ jobs:
             target: x86_64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
             build: yarn build --target x86_64-unknown-linux-gnu
-    name: stable - ${{ matrix.settings.target }} - node@20
+    name: stable - ${{ matrix.settings.target }} - node@18
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +48,7 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-      - name: Install Rust
+      - name: Install
         uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.settings.docker }}
         with:
@@ -61,34 +64,10 @@ jobs:
             .cargo-cache
             target/
           key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
-      - name: Install OpenSSL and Protobuf on macOS
-        if: matrix.settings.host == 'macos-latest'
-        run: |
-          brew install openssl@1.1
-          brew install protobuf
-        env:
-          OPENSSL_DIR: /usr/local/opt/openssl@1.1
-          OPENSSL_LIB_DIR: /usr/local/opt/openssl@1.1/lib
-          OPENSSL_INCLUDE_DIR: /usr/local/opt/openssl@1.1/include
-      - name: Install OpenSSL and Protobuf on Ubuntu
-        if: matrix.settings.host == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl-dev protobuf-compiler
-      - name: Install OpenSSL and Protobuf on Windows
-        if: matrix.settings.host == 'windows-latest'
-        run: |
-          choco install openssl.light
-          choco install protoc
-        env:
-          OPENSSL_DIR: C:\\Program Files\\OpenSSL-Win64
-          OPENSSL_LIB_DIR: C:\\Program Files\\OpenSSL-Win64\\lib
-          OPENSSL_INCLUDE_DIR: C:\\Program Files\\OpenSSL-Win64\\include
-          OPENSSL_STATIC: 1
       - uses: goto-bus-stop/setup-zig@v2
-        if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' || matrix.settings.target == 'armv7-unknown-linux-musleabihf' }}
+        if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
-          version: 0.11.0
+          version: 0.12.0
       - name: Setup toolchain
         run: ${{ matrix.settings.setup }}
         if: ${{ matrix.settings.setup }}
@@ -117,12 +96,37 @@ jobs:
         run: ${{ matrix.settings.build }}
         if: ${{ !matrix.settings.docker }}
         shell: bash
+        - name: Install OpenSSL and Protobuf on macOS
+        if: matrix.settings.host == 'macos-latest'
+        run: |
+          brew install openssl@1.1
+          brew install protobuf
+        env:
+          OPENSSL_DIR: /usr/local/opt/openssl@1.1
+          OPENSSL_LIB_DIR: /usr/local/opt/openssl@1.1/lib
+          OPENSSL_INCLUDE_DIR: /usr/local/opt/openssl@1.1/include
+      - name: Install OpenSSL and Protobuf on Ubuntu
+        if: matrix.settings.host == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev protobuf-compiler
+      - name: Install OpenSSL and Protobuf on Windows
+        if: matrix.settings.host == 'windows-latest'
+        run: |
+          choco install openssl.light
+          choco install protoc
+        env:
+          OPENSSL_DIR: C:\\Program Files\\OpenSSL-Win64
+          OPENSSL_LIB_DIR: C:\\Program Files\\OpenSSL-Win64\\lib
+          OPENSSL_INCLUDE_DIR: C:\\Program Files\\OpenSSL-Win64\\include
+          OPENSSL_STATIC: 1
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.APP_NAME }}.*.node
           if-no-files-found: error
+  
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
     needs:
@@ -131,10 +135,15 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
           - host: windows-latest
             target: x86_64-pc-windows-msvc
+            architecture: x64
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            architecture: arm64
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            architecture: x64
         node:
           - '18'
           - '20'
@@ -146,7 +155,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: yarn
-          architecture: x64
+          architecture: ${{ matrix.settings.architecture }}
       - name: Install dependencies
         run: yarn install
       - name: Download artifacts
@@ -189,12 +198,49 @@ jobs:
         shell: bash
       - name: Test bindings
         run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim yarn test
+  test-linux-x64-musl-binding:
+    name: Test bindings on x86_64-unknown-linux-musl - node@${{ matrix.node }}
+    needs:
+      - build
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+          - '18'
+          - '20'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+      - name: Install dependencies
+        run: |
+          yarn config set supportedArchitectures.libc "musl"
+          yarn install
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: bindings-x86_64-unknown-linux-musl
+          path: .
+      - name: List packages
+        run: ls -R .
+        shell: bash
+      - name: Test bindings
+        run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-alpine yarn test
   publish:
     name: Publish
     runs-on: ubuntu-latest
     needs:
+      - build-freebsd
       - test-macOS-windows-binding
       - test-linux-x64-gnu-binding
+      - test-linux-x64-musl-binding
+      - test-linux-aarch64-gnu-binding
+      - test-linux-aarch64-musl-binding
+      - test-linux-arm-gnueabihf-binding
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
@@ -220,4 +266,13 @@ jobs:
           then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm publish --access public
-          elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\
+          elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+";
+          then
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            npm publish --tag next --access public
+          else
+            echo "Not a release, skipping publish"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
