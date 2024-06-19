@@ -1,7 +1,7 @@
 name: CI
 env:
   DEBUG: napi:*
-  APP_NAME: abc
+  APP_NAME: package-template
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 permissions:
   contents: write
@@ -66,6 +66,10 @@ jobs:
         run: |
           brew install openssl@1.1
           brew install protobuf
+        env:
+          OPENSSL_DIR: /usr/local/opt/openssl@1.1
+          OPENSSL_LIB_DIR: /usr/local/opt/openssl@1.1/lib
+          OPENSSL_INCLUDE_DIR: /usr/local/opt/openssl@1.1/include
       - name: Install OpenSSL and Protobuf on Ubuntu
         if: matrix.settings.host == 'ubuntu-latest'
         run: |
@@ -76,6 +80,11 @@ jobs:
         run: |
           choco install openssl.light
           choco install protoc
+        env:
+          OPENSSL_DIR: C:\\Program Files\\OpenSSL-Win64
+          OPENSSL_LIB_DIR: C:\\Program Files\\OpenSSL-Win64\\lib
+          OPENSSL_INCLUDE_DIR: C:\\Program Files\\OpenSSL-Win64\\include
+          OPENSSL_STATIC: 1
       - uses: goto-bus-stop/setup-zig@v2
         if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' || matrix.settings.target == 'armv7-unknown-linux-musleabihf' }}
         with:
@@ -211,13 +220,4 @@ jobs:
           then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm publish --access public
-          elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+";
-          then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm publish --tag next --access public
-          else
-            echo "Not a release, skipping publish"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\
