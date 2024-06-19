@@ -96,7 +96,7 @@ jobs:
         run: ${{ matrix.settings.build }}
         if: ${{ !matrix.settings.docker }}
         shell: bash
-        - name: Install OpenSSL and Protobuf on macOS
+      - name: Install OpenSSL and Protobuf on macOS
         if: matrix.settings.host == 'macos-latest'
         run: |
           brew install openssl@1.1
