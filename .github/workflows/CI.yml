@@ -83,6 +83,7 @@ jobs:
           sudo apt-get install -y protobuf-compiler
           sudo apt-get install -y openssl
         env:
+          PROTOC: /usr/bin/protoc
           PKG_CONFIG_PATH: /usr/local/ssl/lib/x86_64-linux-gnu/pkgconfig
           OPENSSL_INCLUDE_DIR: /usr/local/ssl/include/openssl
           # X86_64_UNKNOWN_LINUX_GNU_OPENSSL_DIR: /usr/include/openssl 
