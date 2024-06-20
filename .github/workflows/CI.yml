@@ -100,7 +100,7 @@ jobs:
           PROTOC: /usr/bin/protoc 
       - name: Set PROTOC environment variable
         run: |
-            export PROTOC=$PATH:/usr/bin/protoc
+            echo 'export PATH="$PATH:$(pwd)/bin"' >> ~/.bashrc && source ~/.bashrc
         shell: bash
       - name: Verify protoc installation
         run: |
