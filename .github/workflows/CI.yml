@@ -124,7 +124,7 @@ jobs:
       - name: Create symbolic link for OpenSSL headers
         if: ${{ matrix.settings.docker }}
         run: |
-            sudo ln -s /usr/include/openssl
+           sudo ln -s /usr/local/ssl/include/openssl
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
