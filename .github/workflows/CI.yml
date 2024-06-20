@@ -25,12 +25,12 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
-            build: yarn build --target x86_64-apple-darwin
-          - host: windows-latest
-            build: yarn build --target x86_64-pc-windows-msvc
-            target: x86_64-pc-windows-msvc
+          # - host: macos-latest
+          #   target: x86_64-apple-darwin
+          #   build: yarn build --target x86_64-apple-darwin
+          # - host: windows-latest
+          #   build: yarn build --target x86_64-pc-windows-msvc
+          #   target: x86_64-pc-windows-msvc
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
@@ -77,11 +77,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential
           sudo apt-get install -y openssl
-          # sudo apt-get install -y pkg-config
-          # sudo apt-get install -y libssl-dev  # This installs OpenSSL development headers
-          # sudo apt-get install -y cmake libclang-dev
-          # sudo apt-get install -y protobuf-compiler
-
+          sudo apt-get install -y pkg-config
+          sudo apt-get install -y libssl-dev  # This installs OpenSSL development headers
+          sudo apt-get install -y cmake libclang-dev
+          sudo apt-get install -y protobuf-compiler
+        env:
+          PKG_CONFIG_PATH: /usr/local/ssl/lib/x86_64-linux-gnu/pkgconfig
+          OPENSSL_INCLUDE_DIR: /usr/local/ssl/include/openssl
+          # X86_64_UNKNOWN_LINUX_GNU_OPENSSL_DIR: /usr/include/openssl 
+          OPENSSL_LIB_DIR: /usr/local/ssl/lib/x86_64-linux-gnu
+          OPENSSL_NO_VENDOR: 1
+          OPENSSL_STATIC: 1
 
 
       - name: Install OpenSSL and Protobuf on Windows
