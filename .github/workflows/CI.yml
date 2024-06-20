@@ -102,13 +102,13 @@ jobs:
       #   run: |
       #       export PROTOC=$PATH:/usr/bin/protoc
       #   shell: bash
-      - name: Verify protoc installation
-        run: |
-          protoc --version
-          which protoc
-          openssl version -d
+      # - name: Verify protoc installation
+      #   run: |
+      #     protoc --version
+      #     which protoc
+      #     openssl version -d
 
-        shell: bash
+      #   shell: bash
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
         run: |
