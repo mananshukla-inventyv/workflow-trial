@@ -144,6 +144,8 @@ jobs:
         if: ${{ matrix.settings.docker }}
         run: |
            sudo ln -s /usr/local/ssl/include/openssl
+           sudo ln -s /usr/local/bin/protoc
+           sudo ln -s /usr/local/include/google/protobuf
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
