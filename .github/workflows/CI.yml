@@ -100,7 +100,7 @@ jobs:
           PROTOC: /usr/bin/protoc 
       - name: Set PROTOC environment variable
         run: |
-            echo 'export PATH=$PATH:~usr/local/protoc/bin' >> ~/.bashrc && source ~/.bashrc
+            echo 'export PATH=$PATH:/usr/local/protoc/bin' >> ~/.bashrc && source ~/.bashrc
             echo 'export PATH=$PATH:/usr/local/protobuf/bin' >> ~/.bashrc && source ~/.bashrc
 
         shell: bash
