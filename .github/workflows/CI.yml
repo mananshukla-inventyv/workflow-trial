@@ -73,10 +73,11 @@ jobs:
       - name: Install OpenSSL and Protobuf on Ubuntu
         if: matrix.settings.host == 'ubuntu-latest'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl-dev protobuf-compiler
+          sudo apt update
+          sudo apt install openssl
+          sudo apt install -y libssl-dev protobuf-compiler
+          sudo apt install -y cmake libclang-dev
           sudo apt install pkg-config
-          sudo apt-get install cmake
 
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
