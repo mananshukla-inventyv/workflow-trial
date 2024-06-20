@@ -70,7 +70,7 @@ jobs:
           OPENSSL_DIR: /usr/local/opt/openssl@1.1
           OPENSSL_LIB_DIR: /usr/local/opt/openssl@1.1/lib
           OPENSSL_INCLUDE_DIR: /usr/local/opt/openssl@1.1/include
-          
+
       - name: Install OpenSSL and Protobuf on Ubuntu
         if: matrix.settings.host == 'ubuntu-latest'
         run: |
@@ -118,6 +118,10 @@ jobs:
               echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
               echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
               echo "OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV      
+      - name: Create symbolic link for OpenSSL headers
+        if: ${{ matrix.settings.docker }}
+        run: |
+            ln -s /usr/include/openssl /usr/include/openssl
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
@@ -125,10 +129,6 @@ jobs:
           image: ${{ matrix.settings.docker }}
           options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: ${{ matrix.settings.build }}
-      - name: Create symbolic link for OpenSSL headers
-        if: ${{ matrix.settings.docker }}
-        run: |
-            ln -s /usr/include/openssl /usr/include/openssl
       - name: Build
         run: ${{ matrix.settings.build }}
         if: ${{ !matrix.settings.docker }}
