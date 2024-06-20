@@ -82,7 +82,7 @@ jobs:
           sudo apt-get install -y libssl-dev  # This installs OpenSSL development headers
           sudo apt install libssl-dev liblzo2-dev libpam0g-dev
           sudo apt-get install -y cmake libclang-dev
-          sudo apt-get install -y openssl
+          sudo apt-get install -y openssl 
           # PROTOC_ZIP=protoc-3.14.0-linux-x86_64.zip
           # curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/$PROTOC_ZIP
           # sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
