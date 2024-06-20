@@ -77,10 +77,6 @@ jobs:
           sudo apt-get install -y libssl-dev protobuf-compiler
           sudo apt install pkg-config
           sudo apt-get install cmake
-        env:
-          OPENSSL_DIR: /usr/lib/ssl \
-          OPENSSL_LIB_DIR: /usr/lib/x86_64-linux-gnu \
-          OPENSSL_INCLUDE_DIR: /usr/include/openssl
 
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
@@ -113,6 +109,11 @@ jobs:
           node-version: 20
           cache: yarn
           architecture: x86
+      - name: Set OpenSSL environment variables
+        if: ${{ matrix.settings.docker }}
+        run: |
+              echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
+              echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV      
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
