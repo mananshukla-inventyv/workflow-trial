@@ -83,15 +83,21 @@ jobs:
           sudo apt-get install -y protobuf-compiler
           sudo apt-get install -y openssl
         env:
-          PROTOC: /usr/bin/protoc
+          # PROTOC: /usr/bin/protoc
           PKG_CONFIG_PATH: /usr/local/ssl/lib/x86_64-linux-gnu/pkgconfig
           OPENSSL_INCLUDE_DIR: /usr/local/ssl/include/openssl
           # X86_64_UNKNOWN_LINUX_GNU_OPENSSL_DIR: /usr/include/openssl 
           OPENSSL_LIB_DIR: /usr/local/ssl/lib/x86_64-linux-gnu
           OPENSSL_NO_VENDOR: 1
           OPENSSL_STATIC: 1
-
-
+      - name: Set PROTOC environment variable
+        run: |
+            export PROTOC=/usr/bin/protoc
+        shell: bash
+      - name: Verify protoc installation
+        run: |
+          protoc --version
+        shell: bash
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
         run: |
