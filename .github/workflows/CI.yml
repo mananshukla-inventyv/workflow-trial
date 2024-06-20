@@ -70,14 +70,16 @@ jobs:
           OPENSSL_DIR: /usr/local/opt/openssl@1.1
           OPENSSL_LIB_DIR: /usr/local/opt/openssl@1.1/lib
           OPENSSL_INCLUDE_DIR: /usr/local/opt/openssl@1.1/include
+          
       - name: Install OpenSSL and Protobuf on Ubuntu
         if: matrix.settings.host == 'ubuntu-latest'
         run: |
-          sudo apt update
-          sudo apt install openssl=3.0.2
-          sudo apt install -y libssl-dev protobuf-compiler
-          sudo apt install -y cmake libclang-dev
-          sudo apt install pkg-config
+          sudo apt-get update
+          sudo apt-get install libssl-dev  # This installs OpenSSL development headers
+          sudo apt-get install pkg-config
+          sudo apt-get install openssl
+          sudo apt-get install -y protobuf-compiler
+          sudo apt-get install -y cmake libclang-dev
 
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
