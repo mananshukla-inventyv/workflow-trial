@@ -74,7 +74,7 @@ jobs:
         if: matrix.settings.host == 'ubuntu-latest'
         run: |
           sudo apt update
-          sudo apt install openssl@3.0.2
+          sudo apt install openssl=3.0.2
           sudo apt install -y libssl-dev protobuf-compiler
           sudo apt install -y cmake libclang-dev
           sudo apt install pkg-config
