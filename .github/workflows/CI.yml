@@ -92,7 +92,7 @@ jobs:
           OPENSSL_STATIC: 1
       - name: Set PROTOC environment variable
         run: |
-            export PROTOC=/usr/bin/protoc
+            export PROTOC=$PATH:/usr/bin/protoc
         shell: bash
       - name: Verify protoc installation
         run: |
