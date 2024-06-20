@@ -113,7 +113,8 @@ jobs:
         if: ${{ matrix.settings.docker }}
         run: |
               echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
-              echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV      
+              echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
+              echo "OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV      
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
