@@ -96,7 +96,7 @@ jobs:
           OPENSSL_LIB_DIR: /usr/local/ssl/lib/x86_64-linux-gnu
           OPENSSL_NO_VENDOR: 1
           OPENSSL_STATIC: 1
-          # PROTOC: /usr/bin/protoc
+          # PROTOC: /usr/bin/protoc 
           # PROTOC_INCLUDE: /usr/include/google/protobuf
       # - name: Set PROTOC environment variable
       #   run: |
