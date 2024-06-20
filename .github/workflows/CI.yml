@@ -101,6 +101,7 @@ jobs:
         run: |
           protoc --version
           which protoc
+          openssl --d
 
         shell: bash
       - name: Install OpenSSL and Protobuf on Windows
