@@ -81,6 +81,11 @@ jobs:
           sudo apt-get install -y protobuf-compiler
           sudo apt-get install -y cmake libclang-dev
 
+          export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+          echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
+          echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
+          echo "OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV
+
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
         run: |
@@ -111,13 +116,7 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          architecture: x86
-      - name: Set OpenSSL environment variables
-        if: ${{ matrix.settings.docker }}
-        run: |
-              echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
-              echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
-              echo "OPENSSL_NO_VENDOR=1" >> $GITHUB_ENV      
+          architecture: x86  
       - name: Create symbolic link for OpenSSL headers
         if: ${{ matrix.settings.docker }}
         run: |
