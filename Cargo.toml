@@ -24,6 +24,8 @@ config = "0.13.2"   #for config
 lazy_static = "1.4"  #static declaration
 openssl = { version = "0.10", features = ["vendored"] }
 openssl-sys = "0.9"
+tonic = "0.11.0"
+prost = "0.12.6"
 
 
 [build-dependencies]
