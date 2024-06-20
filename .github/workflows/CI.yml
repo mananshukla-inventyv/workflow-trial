@@ -75,28 +75,28 @@ jobs:
         if: matrix.settings.host == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get upgrade
-          sudo apt-get install -y libprotobuf-dev
           sudo apt-get install -y build-essential
+          sudo apt-get install -y libprotobuf-dev
           sudo apt-get install -y pkg-config
-          # sudo apt-get install -y libssl-dev  # This installs OpenSSL development headers
+          sudo apt-get install -y libssl-dev  # This installs OpenSSL development headers
           sudo apt install libssl-dev liblzo2-dev libpam0g-dev
           sudo apt-get install -y cmake libclang-dev
           sudo apt-get install -y openssl
-          PROTOC_ZIP=protoc-3.14.0-linux-x86_64.zip
-          curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/$PROTOC_ZIP
-          sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
-          sudo unzip -o $PROTOC_ZIP -d /usr/local 'include/*'
-          rm -f $PROTOC_ZIP
-        env:
-          PKG_CONFIG_PATH: /usr/local/ssl/lib/x86_64-linux-gnu/pkgconfig
-          OPENSSL_INCLUDE_DIR: /usr/local/ssl/include/openssl
-          # X86_64_UNKNOWN_LINUX_GNU_OPENSSL_DIR: /usr/include/openssl 
-          OPENSSL_LIB_DIR: /usr/local/ssl/lib/x86_64-linux-gnu
-          OPENSSL_NO_VENDOR: 1
-          OPENSSL_STATIC: 1
-          PROTOC: $PATH:/usr/local/bin/protoc
-          PROTOC_INCLUDE: $PATH:/usr/local/include/google/protobuf
+          sudo apt-get install -y protobuf-compiler
+          # PROTOC_ZIP=protoc-3.14.0-linux-x86_64.zip
+          # curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/$PROTOC_ZIP
+          # sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
+          # sudo unzip -o $PROTOC_ZIP -d /usr/local 'include/*'
+          # rm -f $PROTOC_ZIP
+        # env:
+        #   PKG_CONFIG_PATH: /usr/local/ssl/lib/x86_64-linux-gnu/pkgconfig
+        #   OPENSSL_INCLUDE_DIR: /usr/local/ssl/include/openssl
+        #   # X86_64_UNKNOWN_LINUX_GNU_OPENSSL_DIR: /usr/include/openssl 
+        #   OPENSSL_LIB_DIR: /usr/local/ssl/lib/x86_64-linux-gnu
+        #   OPENSSL_NO_VENDOR: 1
+        #   OPENSSL_STATIC: 1
+        #   PROTOC: /usr/bin/protoc
+        #   PROTOC_INCLUDE: /usr/include/google/protobuf
           # PROTOC: /usr/bin/protoc 
       # - name: Set PROTOC environment variable
       #   run: |
