@@ -80,8 +80,7 @@ jobs:
           # sudo apt-get install -y libssl-dev  # This installs OpenSSL development headers
           sudo apt install libssl-dev liblzo2-dev libpam0g-dev
           sudo apt-get install -y cmake libclang-dev
-          sudo apt-get install -y protobuf-compiler
-          sudo apt-get install -y libprotobuf-dev
+          sudo apt-get install -y protobuf-compiler libprotobuf-dev
           sudo apt-get install -y openssl
         env:
           # PROTOC: /usr/bin/protoc
@@ -93,7 +92,7 @@ jobs:
           OPENSSL_STATIC: 1
       - name: Set PROTOC environment variable
         run: |
-            export PROTOC=/usr/bin/protoc
+            export PROTOC=$PATH:/usr/bin/protoc
         shell: bash
       - name: Verify protoc installation
         run: |
