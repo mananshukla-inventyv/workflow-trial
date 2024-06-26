@@ -1,5 +1,5 @@
 {
-  "name": "workflow-test",
+  "name": "tikv-napi-extended",
   "version": "1.0.0",
   "description": "test",
   "main": "index.js",
