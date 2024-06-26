@@ -23,7 +23,7 @@ config = "0.13.2"   #for config
 lazy_static = "1.4"  #static declaration
 uuid = { version = "1.9.1", features = ["v4"] }
 openssl = "0.10.64"
-openssl-sys = "0.9.102"
+openssl-sys = { version = "0.9.102", features = ["vendored"] }
 
 [build-dependencies]
 napi-build = "2.0.1"
