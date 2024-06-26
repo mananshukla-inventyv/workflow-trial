@@ -32,7 +32,7 @@ pub struct BatchResponse {
 }
 
 #[napi(js_name = "getNextKey")]
-pub async fn get_next_key() -> String {
+pub fn get_next_key() -> String {
   Uuid::new_v4().to_string()
 }
 

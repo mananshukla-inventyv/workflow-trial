@@ -34,7 +34,7 @@ jobs:
           # - host: ubuntu-latest
           #   target: x86_64-unknown-linux-gnu
           #   docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
-          #   build: RUST_BACKTRACE=1 yarn build --target x86_64-unknown-linux-gnu
+          #   build: yarn build --target x86_64-unknown-linux-gnu
     name: stable - ${{ matrix.settings.target }} - node@20
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -70,47 +70,18 @@ jobs:
           OPENSSL_DIR: /usr/local/opt/openssl@1.1
           OPENSSL_LIB_DIR: /usr/local/opt/openssl@1.1/lib
           OPENSSL_INCLUDE_DIR: /usr/local/opt/openssl@1.1/include
-
       # - name: Install OpenSSL and Protobuf on Ubuntu
       #   if: matrix.settings.host == 'ubuntu-latest'
       #   run: |
       #     sudo apt-get update
-      #     sudo apt-get install -y build-essential
-      #     sudo apt-get install -y libprotobuf-dev protobuf-compiler
-      #     sudo apt-get install -y 
-      #     sudo apt-get install -y pkg-config
-      #     sudo apt-get install -y libssl-dev  # This installs OpenSSL development headers
-      #     sudo apt install libssl-dev liblzo2-dev libpam0g-dev
-      #     sudo apt-get install -y cmake libclang-dev
-      #     sudo apt-get install -y openssl 
-      #     # PROTOC_ZIP=protoc-3.14.0-linux-x86_64.zip
-      #     # curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/$PROTOC_ZIP
-      #     # sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
-      #     # sudo unzip -o $PROTOC_ZIP -d /usr/local 'include/*'
-      #     # rm -f $PROTOC_ZIP
+      #     sudo apt-get install -y libssl-dev protobuf-compiler
+      #     sudo apt install pkg-config
+      #     sudo apt-get install cmake
       #   env:
-      #   #   PKG_CONFIG_PATH: /usr/local/ssl/lib/x86_64-linux-gnu/pkgconfig
-      #   #   OPENSSL_INCLUDE_DIR: /usr/local/ssl/include/openssl
-      #   #   # X86_64_UNKNOWN_LINUX_GNU_OPENSSL_DIR: /usr/include/openssl 
-      #   #   OPENSSL_LIB_DIR: /usr/local/ssl/lib/x86_64-linux-gnu
-      #   #   OPENSSL_NO_VENDOR: 1
-      #   #   OPENSSL_STATIC: 1
-      #   #   PROTOC: /usr/bin/protoc
-      #   #   PROTOC_INCLUDE: /usr/include/google/protobuf
-      #     PROTOC: /usr/bin/protoc 
-      # - name: Set PROTOC environment variable
-      #   run: |
-      #       echo 'export PATH=$PATH:/usr/local/protoc/bin' >> ~/.bashrc && source ~/.bashrc
-      #       echo 'export PATH=$PATH:/usr/local/protobuf/bin' >> ~/.bashrc && source ~/.bashrc
+      #     OPENSSL_DIR: /usr/lib/ssl \
+      #     OPENSSL_LIB_DIR: /usr/lib/x86_64-linux-gnu \
+      #     OPENSSL_INCLUDE_DIR: /usr/include/openssl
 
-      #   shell: bash
-      # - name: Verify protoc installation
-      #   run: |
-      #     protoc --version
-      #     which protoc
-      #     # openssl version -d
-
-      #   shell: bash
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
         run: |
@@ -121,8 +92,6 @@ jobs:
           OPENSSL_LIB_DIR: C:\\Program Files\\OpenSSL-Win64\\lib
           OPENSSL_INCLUDE_DIR: C:\\Program Files\\OpenSSL-Win64\\include
           OPENSSL_STATIC: 1
-          OPENSSL_NO_VENDOR: 1
-
       - uses: goto-bus-stop/setup-zig@v2
         if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' || matrix.settings.target == 'armv7-unknown-linux-musleabihf' }}
         with:
@@ -143,13 +112,7 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          architecture: x86  
-      - name: Create symbolic link for OpenSSL headers
-        if: ${{ matrix.settings.docker }}
-        run: |
-           sudo ln -s /usr/local/ssl/include/openssl
-           sudo ln -s /usr/local/bin/protoc
-           sudo ln -s /usr/local/include/google/protobuf
+          architecture: x86
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}

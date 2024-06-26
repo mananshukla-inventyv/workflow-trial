@@ -14,7 +14,7 @@ export interface BatchResponse {
   keys: Array<string>
   values?: Array<string>
 }
-export function getNextKey(): Promise<string>
+export function getNextKey(): string
 export function initClient(tikvConnParam?: TikvConnParams | undefined | null): Promise<string>
 export function startLogger(): void
 export function getDocument(key: string, withCas: boolean, projectName?: string | undefined | null): Promise<any>
