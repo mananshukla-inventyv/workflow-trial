@@ -6,6 +6,8 @@ extern crate napi_derive;
 pub mod configration;
 pub mod logger;
 
+use std::{thread, time::Duration};
+
 use logger::LoggerConfig;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
@@ -105,6 +107,7 @@ pub async fn get_document(
   project_name: Option<String>,
 ) -> Result<Value, napi::Error> {
   let client = create_client(None).await;
+  
   match client {
     Ok(client) => {
       let mut new_key = key;
@@ -190,6 +193,7 @@ pub async fn add_document(
         Err(error) => {
           if retry <= 10 {
             log::info!("Retrying for {} time", retry.to_owned());
+            thread::sleep(Duration::from_secs(1));
             if let Err(error) = Box::pin(add_document(
               key.to_owned(),
               value,
@@ -233,7 +237,7 @@ pub async fn replace_document(
   retry: Option<u32>,
 ) -> Result<String, napi::Error> {
   let client = create_client(None).await;
-  let retry = retry.unwrap_or(0);
+  let retry = retry.unwrap_or(1);
   match client {
     Ok(client) => {
       let mut new_key = key.to_owned();
@@ -262,6 +266,7 @@ pub async fn replace_document(
             if !_flag {
               if retry <= 10 {
                 log::info!("Retrying for {} time", retry.to_owned());
+                thread::sleep(Duration::from_secs(1));
                 Box::pin(replace_document(
                   key.to_owned(),
                   value,
@@ -300,6 +305,7 @@ pub async fn replace_document(
           Err(error) => {
             if retry <= 10 {
               log::info!("Retrying for {} time", retry.to_owned());
+              thread::sleep(Duration::from_secs(1));
               if let Err(error) = Box::pin(replace_document(
                 key.to_owned(),
                 value,
