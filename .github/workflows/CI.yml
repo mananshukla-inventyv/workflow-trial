@@ -76,11 +76,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential
-          sudo apt install -y openssl
           sudo apt install -y pkg-config
           # sudo apt install -y libssl-dev  # This installs OpenSSL development headers
-          sudo apt install libssl-dev liblzo2-dev libpam0g-dev
+          sudo apt install -y libssl-dev liblzo2-dev libpam0g-dev
           sudo apt install -y cmake libclang-dev
+          sudo apt install -y openssl
+          sudo apt install -y libprotobuf-dev libprotoc-dev
           sudo apt install -y protobuf-compiler
           sudo ldconfig
       - name: Install OpenSSL and Protobuf on Windows
