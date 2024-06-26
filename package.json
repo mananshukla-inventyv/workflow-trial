@@ -1,9 +1,9 @@
 {
-  "name": "tikv-napi-extended",
+  "name": "tikv_napi_extended",
   "version": "1.0.0",
   "description": "test",
   "main": "index.js",
-  "repository": "https://github.com/mananshukla-inventyv/workflow-trial.git",
+  "repository": "https://github.com/mananshukla-inventyv/tikv-napi-extended.git",
   "license": "MIT",
   "keywords": [
     "napi-rs",
@@ -18,7 +18,7 @@
     "index.js"
   ],
   "napi": {
-    "name": "tikv-napi-extended",
+    "name": "workflow-trial",
     "triples": {
       "defaults": true,
       "additional": [
