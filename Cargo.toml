@@ -22,7 +22,10 @@ log4rs = { version ="1.0.0", features = ["gzip"] }
 config = "0.13.2"   #for config
 lazy_static = "1.4"  #static declaration
 uuid = { version = "1.9.1", features = ["v4"] }
-openssl-sys = "0.9.102" 
+
+[target.'cfg(unix)'.dependencies]
+openssl-sys = { version = "0.9.102", features = ["vendored"] }
+
 
 [build-dependencies]
 napi-build = "2.0.1"
