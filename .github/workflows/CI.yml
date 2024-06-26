@@ -76,15 +76,16 @@ jobs:
         if: matrix.settings.host == 'ubuntu-latest'
         run: |
           sudo apt update
-          sudo apt install -y build-essential
-          sudo apt install -y pkg-config
+          # sudo apt install -y build-essential
+          # sudo apt install -y pkg-config
           # sudo apt install -y libssl-dev  # This installs OpenSSL development headers
-          sudo apt install -y libssl-dev liblzo2-dev libpam0g-dev
+          # sudo apt install -y libssl-dev liblzo2-dev libpam0g-dev
           sudo apt install -y cmake libclang-dev
           sudo apt install -y openssl
-          sudo apt install -y libprotobuf-dev libprotoc-dev
+          sudo apt install -y libprotobuf-dev
+          #  libprotoc-dev
           sudo apt install -y protobuf-compiler
-          sudo ldconfig
+          # sudo ldconfig
       - name: Install OpenSSL and Protobuf on Windows
         if: matrix.settings.host == 'windows-latest'
         run: |
@@ -124,13 +125,13 @@ jobs:
       #     sudo mv protoc3/include/* /usr/local/include/
 
         
-      - name: Create symbolic link for OpenSSL headers
-        if: ${{ matrix.settings.docker }}
-        run: |
-             sudo ln -s /usr/local/ssl/include/openssl
-             sudo ln -s /usr/bin/protoc
-             sudo ln -s /usr/include/google/protobuf
-             sudo ldconfig
+      # - name: Create symbolic link for OpenSSL headers
+      #   if: ${{ matrix.settings.docker }}
+      #   run: |
+      #        sudo ln -s /usr/local/ssl/include/openssl
+      #        sudo ln -s /usr/bin/protoc
+      #        sudo ln -s /usr/include/google/protobuf
+      #        sudo ldconfig
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
