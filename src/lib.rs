@@ -28,7 +28,7 @@ pub struct TikvConnParams {
 #[napi(object)]
 pub struct BatchResponse {
   pub keys: Vec<String>,
-  pub values: Option<Vec<String>>,
+  pub values: Option<Vec<Value>>,
 }
 
 #[napi(js_name = "getNextKey")]
@@ -412,15 +412,26 @@ pub async fn get_batch_using_scan(
                   .replace(&prefix_value, "")
               })
               .collect();
-            let string_values: Vec<String> = scan
-              .iter()
-              .map(|key| String::from_utf8_lossy(&key.1.to_vec()).to_string())
-              .collect();
-            let res = BatchResponse {
-              keys: string_keys,
-              values: Some(string_values),
-            };
-            return Ok(res);
+            let string_values: Result<Vec<Value>, napi::Error>= scan
+                  .iter()
+                  .map(|key| {
+                    let res=String::from_utf8_lossy(&key.1.to_vec()).to_string();
+                    serde_json::from_str(&res)
+                    .map_err(|e| napi::Error::from_reason(format!("JSON parsing error: {}", e)))
+
+                  }).collect();
+                  match string_values {
+                      Ok(values)=>{
+                        let res = BatchResponse {
+                          keys: string_keys,
+                          values: Some(values),
+                        };
+                        return Ok(res);
+                      }
+                      Err(error)=>{
+                        return Err(napi::Error::from_reason("Error while parsing values in kev value pair"));
+                      }
+                  }
           }
           Err(error) => return Err(napi::Error::from_reason(error.to_string())),
         }
@@ -478,15 +489,27 @@ pub async fn get_batch(
                       .replace(&prefix_value, "")
                   })
                   .collect();
-                let string_values: Vec<String> = get_batch_res
+                let string_values: Result<Vec<Value>, napi::Error>= get_batch_res
                   .iter()
-                  .map(|key| String::from_utf8_lossy(&key.1.to_vec()).to_string())
-                  .collect();
-                let res = BatchResponse {
-                  keys: string_keys,
-                  values: Some(string_values),
-                };
-                return Ok(res);
+                  .map(|key| {
+                    let res=String::from_utf8_lossy(&key.1.to_vec()).to_string();
+                    serde_json::from_str(&res)
+                    .map_err(|e| napi::Error::from_reason(format!("JSON parsing error: {}", e)))
+
+                  }).collect();
+                  match string_values {
+                      Ok(values)=>{
+                        let res = BatchResponse {
+                          keys: string_keys,
+                          values: Some(values),
+                        };
+                        return Ok(res);
+                      }
+                      Err(error)=>{
+                        return Err(napi::Error::from_reason("Error while parsing values in kev value pair"));
+                      }
+                  }
+                
               }
               Err(error) => return Err(napi::Error::from_reason(error.to_string())),
             }

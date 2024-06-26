@@ -12,7 +12,7 @@ export interface TikvConnParams {
 }
 export interface BatchResponse {
   keys: Array<string>
-  values?: Array<string>
+  values?: Array<any>
 }
 export function getNextKey(): string
 export function initClient(tikvConnParam?: TikvConnParams | undefined | null): Promise<string>
