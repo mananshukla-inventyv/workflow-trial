@@ -94,7 +94,6 @@ jobs:
           OPENSSL_DIR: C:\\Program Files\\OpenSSL-Win64
           OPENSSL_LIB_DIR: C:\\Program Files\\OpenSSL-Win64\\lib
           OPENSSL_INCLUDE_DIR: C:\\Program Files\\OpenSSL-Win64\\include
-          OPENSSL_STATIC: 1
       - uses: goto-bus-stop/setup-zig@v2
         if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' || matrix.settings.target == 'armv7-unknown-linux-musleabihf' }}
         with:
