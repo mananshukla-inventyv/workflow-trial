@@ -114,6 +114,15 @@ jobs:
           node-version: 20
           cache: yarn
           architecture: x86  
+      - name: Custom protoc installation
+        if: matrix.settings.host == 'ubuntu-latest'
+        run: |
+          curl -OL https://github.com/google/protobuf/releases/download/v3.15.8/protoc-3.15.8-linux-x86_64.zip
+          unzip protoc-3.15.8-linux-x86_64.zip -d protoc3
+          sudo mv protoc3/bin/* /usr/local/bin/
+          sudo mv protoc3/include/* /usr/local/include/
+
+        
       - name: Create symbolic link for OpenSSL headers
         if: ${{ matrix.settings.docker }}
         run: |
