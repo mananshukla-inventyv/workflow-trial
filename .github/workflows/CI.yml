@@ -148,8 +148,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-      - name: Move artifacts
-        run: yarn artifacts
+      - name: Move artifacts to npm directory
+        run: |
+         find artifacts -type f -name "*.node" -exec mv {} npm/ \;
       - name: List packages
         run: ls -R ./npm
         shell: bash
